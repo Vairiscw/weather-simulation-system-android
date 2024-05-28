@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">wssandroid</string>
+    <string name="windTV">Wind</string>
+    <string name="humidityTV">Humidity</string>
+</resources>
