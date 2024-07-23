@@ -1,4 +1,4 @@
-package com.vairiscw.wssandroid.data.fan;
+package com.vairiscw.wssandroid.API.fan;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -8,10 +8,10 @@ import retrofit2.http.Query;
 
 public interface FanAPI {
 
-    @POST("/relay")
+    @POST("/fan")
     Call<ResponseBody> postStatus(@Query("state") String status);
 
-    @GET("/relay/state")
+    @GET("/fan")
     Call<ResponseBody> getStatus();
 
 }

@@ -1,8 +1,7 @@
-package com.vairiscw.wssandroid;
+package com.vairiscw.wssandroid.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,13 +11,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.vairiscw.wssandroid.R;
 import com.vairiscw.wssandroid.config.RetrofitClient;
-import com.vairiscw.wssandroid.data.fan.FanAPI;
-import com.vairiscw.wssandroid.data.temperature.TemperatureAPI;
-import com.vairiscw.wssandroid.data.temperature.TemperatureData;
-import com.vairiscw.wssandroid.view.RecycleAdapter;
+import com.vairiscw.wssandroid.API.fan.FanAPI;
+import com.vairiscw.wssandroid.data.scenes.Scenes;
+import com.vairiscw.wssandroid.data.scenes.ScenesAPI;
+import com.vairiscw.wssandroid.data.scenes.ScenesAdapter;
+import com.vairiscw.wssandroid.data.times.Times;
+import com.vairiscw.wssandroid.data.times.TimesAPI;
+import com.vairiscw.wssandroid.data.times.TimesAdapter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -32,15 +34,15 @@ public class MainActivity extends AppCompatActivity {
     Button closeButton;
     ConstraintLayout slideLayout;
     RecyclerView recView;
-
+    TimesAdapter timesAdapter;
+    ScenesAdapter scenesAdapter;
     Button fanButton;
     TextView windStatusTV;
     String windStatus = "off";
-    private final String serverUrl = "serverURL";
+    private final String serverUrl = "http://192.168.27.134:9898";
     FanAPI fanAPI;
-    TemperatureAPI temperatureAPI;
-    RecycleAdapter adapter;
-
+    ScenesAPI scenesAPI;
+    TimesAPI timesAPI;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,8 +61,8 @@ public class MainActivity extends AppCompatActivity {
 
         Retrofit retrofit = RetrofitClient.getClient(serverUrl);
         fanAPI = retrofit.create(FanAPI.class);
-        temperatureAPI = retrofit.create(TemperatureAPI.class);
-
+        scenesAPI = retrofit.create(ScenesAPI.class);
+        timesAPI = retrofit.create(TimesAPI.class);
         fanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,9 +74,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 slideLayout.setVisibility(View.VISIBLE);
-                getTemperatures();
                 closeButton.setEnabled(true);
                 openButton.setEnabled(false);
+                printTimes();
             }
         });
 
@@ -88,20 +90,38 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    protected void getFan() {
-        Call<ResponseBody> call = fanAPI.getStatus();
-        call.enqueue(new Callback<ResponseBody>() {
+    protected void printScenes() {
+        Call<List<Scenes>> call = scenesAPI.getScenes();
+        call.enqueue(new Callback<List<Scenes>>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                    assert response.body() != null;
-                }
+            public void onResponse(Call<List<Scenes>> call, Response<List<Scenes>> response) {
+                List<Scenes> scenesList = response.body();
+                scenesAdapter = new ScenesAdapter(scenesList);
+                recView.setAdapter(scenesAdapter);
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable throwable) {
-                windStatusTV.setText("-");
-                Log.d("MainActivity", throwable.getMessage());
+            public void onFailure(Call<List<Scenes>> call, Throwable throwable) {
+                Log.d("TAG", throwable.getMessage());
+            }
+        });
+    }
+
+    protected void printTimes() {
+        Call<List<Times>> call = timesAPI.getTimes();
+
+        call.enqueue(new Callback<List<Times>>() {
+            @Override
+            public void onResponse(Call<List<Times>> call, Response<List<Times>> response) {
+                List<Times> timesList = response.body();
+                Log.d("PRINT", timesList.toString());
+                timesAdapter = new TimesAdapter(timesList);
+                recView.setAdapter(timesAdapter);
+            }
+
+            @Override
+            public void onFailure(Call<List<Times>> call, Throwable throwable) {
+                Log.d("TAG", throwable.getMessage());
             }
         });
     }
@@ -122,30 +142,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable throwable) {
-                Log.d("TAG", throwable.toString());
+                Log.d("TAG", throwable.getMessage());
+                finish();
             }
         });
-    }
+    }}
 
-    protected void getTemperatures() {
-        Call<List<TemperatureData>> call = temperatureAPI.getTemperatures();
-        call.enqueue(new Callback<List<TemperatureData>>() {
-            @Override
-            public void onResponse(Call<List<TemperatureData>> call, Response<List<TemperatureData>> response) {
-                if (response.isSuccessful()) {
-                    List<TemperatureData> dataList = response.body();
-                    adapter = new RecycleAdapter(dataList);
-                    recView.setAdapter(adapter);
-                    Log.d("MainActivity", dataList.toString());
-                } else {
-                    Log.e("MainActivity", "Response error: " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<TemperatureData>> call, Throwable t) {
-                Log.e("MainActivity", "Request failed: " + t.getMessage());
-            }
-        });
-    }
-}

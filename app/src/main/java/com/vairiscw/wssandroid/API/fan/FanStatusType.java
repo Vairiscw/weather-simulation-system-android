@@ -1,4 +1,4 @@
-package com.vairiscw.wssandroid.data.fan;
+package com.vairiscw.wssandroid.API.fan;
 
 public class FanStatusType {
     String fanStatus;
