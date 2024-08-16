@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">wssandroid</string>
-    <string name="windTV">Wind</string>
-    <string name="humidityTV">Humidity</string>
     <string name="connection_button_text">Подключиться</string>
+    <string name="button_choise_text">Выбрать</string>
 </resources>

@@ -6,19 +6,25 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vairiscw.wssandroid.R;
-import com.vairiscw.wssandroid.adapters.ListRecyclerAdapter;
+import com.vairiscw.wssandroid.adapters.BigListRecyclerAdapter;
+import com.vairiscw.wssandroid.adapters.SmallListRecyclerAdapter;
 import com.vairiscw.wssandroid.config.RetrofitClient;
 import com.vairiscw.wssandroid.API.fan.FanAPI;
 import com.vairiscw.wssandroid.data.scenes.ScenesAPI;
 import com.vairiscw.wssandroid.data.times.TimesAPI;
-import com.vairiscw.wssandroid.view.environment_page.EnvironmentPage;
+import com.vairiscw.wssandroid.view.environment_page.BigEnvironmentPage;
+import com.vairiscw.wssandroid.view.environment_page.SmallEnvironmentPage;
 import com.vairiscw.wssandroid.view.environment_page.NoPaddingItemDecoration;
 
 import java.util.ArrayList;
@@ -27,27 +33,53 @@ import java.util.List;
 import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity {
-
+    //Параметры погоды
     RecyclerView weatherRecyclerView;
-    List<EnvironmentPage> weatherList;
+    List<SmallEnvironmentPage> weatherList;
     int[] weatherIcons = {R.drawable.sun_icon, R.drawable.clouds_icon, R.drawable.rain_icon};
     String[] weatherTitles = {"Ясно", "Пасмурно", "Дождь"};
-    ListRecyclerAdapter weatherRecyclerAdapter;
+    int weatherListSize = 3;
+    SmallListRecyclerAdapter weatherRecyclerAdapter;
 
+    //Параметры звука
     RecyclerView soundsRecyclerView;
-    List<EnvironmentPage> soundsList;
+    List<SmallEnvironmentPage> soundsList;
     int[] soundsIcons = {R.drawable.creature_icon, R.drawable.water_icon, R.drawable.birds_icon, R.drawable.fireplace_icon};
     String[] soundsTitles = {"Сверчки", "Вода", "Птицы", "Камин"};
-    ListRecyclerAdapter soundsRecyclerAdapter;
-
+    int soundsListSize = 4;
+    SmallListRecyclerAdapter soundsRecyclerAdapter;
+    //Параметры дня
     ImageView sunIcon;
     TextView sunText;
     Button timeSunButton;
-
+    //Параметры ночи
     ImageView nightIcon;
     TextView nightText;
     Button timeNightButton;
 
+    TextView TitleText;
+    //Параметры видео
+    int[] videoImages = {R.drawable.castle};
+    String[] videoTitles = {"Замок"};
+    int videoListSize = 1;
+    List<BigEnvironmentPage> videoList;
+    Button videoChoiceButton;
+    ImageView videoExitButton;
+    RecyclerView videoRecyclerView;
+    BigListRecyclerAdapter videoRecyclerAdapter;
+    TextView videoUnderText;
+    //Параметры сцены
+    int[] sceneImages = {R.drawable.stone_garden};
+    String[] sceneTitles = {"Сад камней"};
+    int sceneListSize = 1;
+    List<BigEnvironmentPage> sceneList;
+    Button sceneChoiceButton;
+    ImageView sceneExitButton;
+    RecyclerView sceneRecyclerView;
+    BigListRecyclerAdapter sceneRecyclerAdapter;
+    TextView sceneUnderText;
+
+    //Интернет
     private final String serverUrl = "http://192.168.27.134:9898";
     FanAPI fanAPI;
     ScenesAPI scenesAPI;
@@ -61,15 +93,14 @@ public class MainActivity extends AppCompatActivity {
         weatherRecycleSetup();
         timeButtonSetup();
         soundsRecyclerSetup();
+        videoChoiceSetup();
+        sceneChoiceSetup();
 
         Retrofit retrofit = RetrofitClient.getClient(serverUrl);
         fanAPI = retrofit.create(FanAPI.class);
         scenesAPI = retrofit.create(ScenesAPI.class);
         timesAPI = retrofit.create(TimesAPI.class);
-
     }
-
-
 
 //    protected void postStatus() {
 //
@@ -95,15 +126,15 @@ public class MainActivity extends AppCompatActivity {
 
     protected void weatherRecycleSetup() {
         weatherList = new ArrayList<>();
-        for (int i = 0; i < 3; ++i) {
-            weatherList.add(new EnvironmentPage(weatherIcons[i], weatherTitles[i]));
+        for (int i = 0; i < weatherListSize; ++i) {
+            weatherList.add(new SmallEnvironmentPage(weatherIcons[i], weatherTitles[i]));
         }
 
         weatherRecyclerView = findViewById(R.id.weatherRecyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         weatherRecyclerView.setLayoutManager(layoutManager);
         weatherRecyclerView.addItemDecoration(new NoPaddingItemDecoration());
-        weatherRecyclerAdapter = new ListRecyclerAdapter(weatherList, this);
+        weatherRecyclerAdapter = new SmallListRecyclerAdapter(weatherList, this);
         weatherRecyclerView.setAdapter(weatherRecyclerAdapter);
 
         LinearSnapHelper snapHelper = new LinearSnapHelper();
@@ -163,15 +194,15 @@ public class MainActivity extends AppCompatActivity {
 
     protected void soundsRecyclerSetup() {
         soundsList = new ArrayList<>();
-        for (int i = 0; i < 4; ++i) {
-            soundsList.add(new EnvironmentPage(soundsIcons[i], soundsTitles[i]));
+        for (int i = 0; i < soundsListSize; ++i) {
+            soundsList.add(new SmallEnvironmentPage(soundsIcons[i], soundsTitles[i]));
         }
 
         soundsRecyclerView = findViewById(R.id.soundsRecyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         soundsRecyclerView.setLayoutManager(layoutManager);
         soundsRecyclerView.addItemDecoration(new NoPaddingItemDecoration());
-        soundsRecyclerAdapter = new ListRecyclerAdapter(soundsList, this);
+        soundsRecyclerAdapter = new SmallListRecyclerAdapter(soundsList, this);
         soundsRecyclerView.setAdapter(soundsRecyclerAdapter);
 
         LinearSnapHelper snapHelper = new LinearSnapHelper();
@@ -188,6 +219,128 @@ public class MainActivity extends AppCompatActivity {
                         soundsRecyclerAdapter.setActivePosition(position);
                     }
                 }
+            }
+        });
+    }
+
+    protected void videoChoiceSetup() {
+        videoChoiceButton = findViewById(R.id.videoButton);
+        Dialog dialog = new Dialog(MainActivity.this);
+
+        videoChoiceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.setContentView(R.layout.choice_window_layout);
+                dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.setCancelable(false);
+                //dialog.getWindow().getAttributes().windowAnimations = R.style.animation;
+                TitleText = dialog.findViewById(R.id.textView);
+                TitleText.setText("Видео");
+                videoExitButton = dialog.findViewById(R.id.videoExitButton);
+                videoUnderText = dialog.findViewById(R.id.titleTextView);
+
+                videoExitButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+
+                videoList = new ArrayList<>();
+                for (int i = 0; i < videoListSize; ++i) {
+                    videoList.add(new BigEnvironmentPage(videoImages[i]));
+                }
+
+                videoRecyclerView = dialog.findViewById(R.id.windowedRecyclerView);
+
+                LinearLayoutManager layoutManager = new LinearLayoutManager(v.getContext(), LinearLayoutManager.HORIZONTAL, false);
+                videoRecyclerView.setLayoutManager(layoutManager);
+                videoRecyclerView.addItemDecoration(new NoPaddingItemDecoration());
+                videoRecyclerAdapter = new BigListRecyclerAdapter(videoList, v.getContext());
+                videoRecyclerView.setAdapter(videoRecyclerAdapter);
+
+                LinearSnapHelper snapHelper = new LinearSnapHelper();
+                snapHelper.attachToRecyclerView(videoRecyclerView);
+
+                videoRecyclerView.scrollToPosition(Integer.MAX_VALUE / 2);
+                videoRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                            View snappedView = snapHelper.findSnapView(layoutManager);
+                            if (snappedView != null) {
+                                int position = recyclerView.getChildAdapterPosition(snappedView);
+                                videoRecyclerAdapter.setActivePosition(position);
+
+                                videoUnderText.setText(videoTitles[position % videoListSize]);
+                            }
+                        }
+                    }
+                });
+
+                dialog.show();
+            }
+        });
+    }
+
+    protected void sceneChoiceSetup() {
+        sceneChoiceButton = findViewById(R.id.sceneButton);
+        Dialog dialog = new Dialog(MainActivity.this);
+
+        sceneChoiceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.setContentView(R.layout.choice_window_layout);
+                dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.setCancelable(false);
+                //dialog.getWindow().getAttributes().windowAnimations = R.style.animation;
+                TitleText = dialog.findViewById(R.id.textView);
+                TitleText.setText("Видео");
+                sceneExitButton = dialog.findViewById(R.id.videoExitButton);
+                sceneUnderText = dialog.findViewById(R.id.titleTextView);
+
+                sceneExitButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+
+                sceneList = new ArrayList<>();
+                for (int i = 0; i < sceneListSize; ++i) {
+                    sceneList.add(new BigEnvironmentPage(sceneImages[i]));
+                }
+
+                sceneRecyclerView = dialog.findViewById(R.id.windowedRecyclerView);
+
+                LinearLayoutManager layoutManager = new LinearLayoutManager(v.getContext(), LinearLayoutManager.HORIZONTAL, false);
+                sceneRecyclerView.setLayoutManager(layoutManager);
+                sceneRecyclerView.addItemDecoration(new NoPaddingItemDecoration());
+                sceneRecyclerAdapter = new BigListRecyclerAdapter(sceneList, v.getContext());
+                sceneRecyclerView.setAdapter(sceneRecyclerAdapter);
+
+                LinearSnapHelper snapHelper = new LinearSnapHelper();
+                snapHelper.attachToRecyclerView(sceneRecyclerView);
+
+                sceneRecyclerView.scrollToPosition(Integer.MAX_VALUE / 2);
+                sceneRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                            View snappedView = snapHelper.findSnapView(layoutManager);
+                            if (snappedView != null) {
+                                int position = recyclerView.getChildAdapterPosition(snappedView);
+                                sceneRecyclerAdapter.setActivePosition(position);
+
+                                sceneUnderText.setText(sceneTitles[position % sceneListSize]);
+                            }
+                        }
+                    }
+                });
+
+                dialog.show();
             }
         });
     }

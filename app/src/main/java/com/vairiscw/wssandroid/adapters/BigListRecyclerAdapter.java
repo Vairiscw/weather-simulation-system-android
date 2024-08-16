@@ -12,43 +12,32 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.vairiscw.wssandroid.R;
-import com.vairiscw.wssandroid.view.environment_page.EnvironmentPage;
+import com.vairiscw.wssandroid.view.environment_page.BigEnvironmentPage;
 
 import java.util.List;
 
-public class ListRecyclerAdapter extends RecyclerView.Adapter<ListRecyclerAdapter.ViewHolder> {
-    private List<EnvironmentPage> data;
+public class BigListRecyclerAdapter extends RecyclerView.Adapter<BigListRecyclerAdapter.ViewHolder> {
+    private List<BigEnvironmentPage> data;
     private Context context;
     int currentActivePosition;
 
-    public ListRecyclerAdapter(List<EnvironmentPage> data, Context context) {
+    public BigListRecyclerAdapter(List<BigEnvironmentPage> data, Context context) {
         this.data = data;
         this.context = context;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_view, parent, false);
-        return new ViewHolder(view);
+    public BigListRecyclerAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_without_text_list_view, parent, false);
+        return new BigListRecyclerAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull BigListRecyclerAdapter.ViewHolder holder, int position) {
         int realPosition = position % data.size();
-        EnvironmentPage data = this.data.get(realPosition);
-        holder.textView.setText(data.getText());
+        BigEnvironmentPage data = this.data.get(realPosition);
         holder.imageView.setImageResource(data.getImage());
-        if (position == currentActivePosition) {
-            holder.imageView.clearColorFilter();
-            holder.imageView.setColorFilter(ContextCompat.getColor(context, R.color.active_icon_color));
-            holder.textView.setTextColor(ContextCompat.getColor(context, R.color.active_icon_color));
-        } else {
-            holder.imageView.clearColorFilter();
-            holder.imageView.setColorFilter(ContextCompat.getColor(context, R.color.disable_icon_color));
-            holder.textView.setTextColor(ContextCompat.getColor(context, R.color.disable_icon_color));
-        }
-
     }
 
     @Override
@@ -58,11 +47,9 @@ public class ListRecyclerAdapter extends RecyclerView.Adapter<ListRecyclerAdapte
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
-        TextView textView;
         public ViewHolder(View view) {
             super(view);
             imageView = view.findViewById(R.id.IconView);
-            textView = view.findViewById(R.id.TitleView);
         }
     }
 
@@ -74,5 +61,4 @@ public class ListRecyclerAdapter extends RecyclerView.Adapter<ListRecyclerAdapte
         }
         notifyItemChanged(currentActivePosition);
     }
-
 }

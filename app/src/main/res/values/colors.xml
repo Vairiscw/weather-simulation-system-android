@@ -4,10 +4,12 @@
     <color name="white">#FFFFFFFF</color>
     <color name="title_color">#3A4343</color>
     <color name="background_color">#f3fcfd</color>
-    <color name="button_color">#3A4343</color>
+    <color name="primary_color">#8C8AE6</color>
     <color name="second_color">#e2eff0</color>
     <color name="text_color">#110a37</color>
-    <color name="active_icon_color">#91BE49</color>
+    <color name="active_icon_color">#8C8AE6</color>
     <color name="disable_icon_color">#B2C2C2</color>
     <color name="active_sun_icon_color">#ECCD51</color>
+
+    <color name="navigation_bar_color">#E0E7E8</color>
 </resources>

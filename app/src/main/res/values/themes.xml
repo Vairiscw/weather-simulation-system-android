@@ -1,6 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.Wssandroid" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimaryDark">@color/background_color</item>
+        <item name="android:navigationBarColor">@color/navigation_bar_color</item>
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
