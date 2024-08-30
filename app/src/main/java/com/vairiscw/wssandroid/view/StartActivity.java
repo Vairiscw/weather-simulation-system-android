@@ -39,16 +39,12 @@ public class StartActivity extends AppCompatActivity {
         connectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isConnected()) { // Для теста
-                    startActivity(new Intent(StartActivity.this, MainActivity.class));
-                } else {
-                    Toast.makeText(StartActivity.this, "Не удалось подключиться",Toast.LENGTH_LONG).show();
-                }
+                tryConnected();
             }
         });
     }
 
-    protected boolean isConnected() {
+    protected void tryConnected() {
         Call<ResponseBody> call = checkAPI.checkingConnection();
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -56,21 +52,20 @@ public class StartActivity extends AppCompatActivity {
                 if (response.isSuccessful()){
                     Log.d("StartActivity", "Successful");
                     connection = true;
+                    startActivity(new Intent(StartActivity.this, MainActivity.class));
+
                 }
                 else {
                     Log.d("StartActivity", "What");
-                    connection = false;
+                    Toast.makeText(StartActivity.this, "Не удалось подключиться",Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable throwable) {
                 Log.d("TAG", throwable.getMessage());Log.d("TAG", call.request().toString());
-                connection = false;
+                Toast.makeText(StartActivity.this, "Не удалось подключиться",Toast.LENGTH_LONG).show();
             }
         });
-
-
-        return connection;
     }
 }

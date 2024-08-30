@@ -53,7 +53,7 @@ public class SmallListRecyclerAdapter extends RecyclerView.Adapter<SmallListRecy
 
     @Override
     public int getItemCount() {
-        return Integer.MAX_VALUE;
+        return Integer.MAX_VALUE - 1;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -70,9 +70,8 @@ public class SmallListRecyclerAdapter extends RecyclerView.Adapter<SmallListRecy
         int previousActivePosition = currentActivePosition;
         currentActivePosition = position;
         if (previousActivePosition != RecyclerView.NO_POSITION) {
-            notifyItemChanged(previousActivePosition);
+            notifyDataSetChanged();
         }
-        notifyItemChanged(currentActivePosition);
+        notifyDataSetChanged();
     }
-
 }

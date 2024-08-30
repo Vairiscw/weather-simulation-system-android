@@ -1,6 +1,6 @@
-package com.vairiscw.wssandroid.data.times;
+package com.vairiscw.wssandroid.data.environment;
 
-public class Times {
+public class Video {
     Long id;
     String designation;
 
@@ -20,7 +20,7 @@ public class Times {
         this.designation = designation;
     }
 
-    public Times(Long id, String designation) {
+    public Video(Long id, String designation) {
         this.id = id;
         this.designation = designation;
     }

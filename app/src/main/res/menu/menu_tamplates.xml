@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:icon="@drawable/save_icon"
+        android:id="@+id/template_save"
+        android:title="Сохранить"/>
+    <item
+        android:id="@+id/show_templates"
+        android:title="Выбрать пресет">
+        <menu>
+            <item
+                android:id="@+id/template_list"
+                android:title="TODO" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/template_delete"
+        android:title="Удалить"/>
+
+</menu>

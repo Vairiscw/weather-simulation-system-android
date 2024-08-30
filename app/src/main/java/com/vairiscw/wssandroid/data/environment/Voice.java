@@ -1,7 +1,6 @@
-package com.vairiscw.wssandroid.data.scenes;
+package com.vairiscw.wssandroid.data.environment;
 
-
-public class Scenes {
+public class Voice {
     Long id;
     String designation;
 
@@ -21,7 +20,7 @@ public class Scenes {
         this.designation = designation;
     }
 
-    public Scenes(Long id, String designation) {
+    public Voice(Long id, String designation) {
         this.id = id;
         this.designation = designation;
     }

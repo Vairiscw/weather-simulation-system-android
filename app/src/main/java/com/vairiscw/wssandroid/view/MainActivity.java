@@ -1,19 +1,23 @@
 package com.vairiscw.wssandroid.view;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.vairiscw.wssandroid.R;
@@ -21,8 +25,8 @@ import com.vairiscw.wssandroid.adapters.BigListRecyclerAdapter;
 import com.vairiscw.wssandroid.adapters.SmallListRecyclerAdapter;
 import com.vairiscw.wssandroid.config.RetrofitClient;
 import com.vairiscw.wssandroid.API.fan.FanAPI;
-import com.vairiscw.wssandroid.data.scenes.ScenesAPI;
-import com.vairiscw.wssandroid.data.times.TimesAPI;
+import com.vairiscw.wssandroid.API.enviroments.ScenesAPI;
+import com.vairiscw.wssandroid.API.enviroments.TimesAPI;
 import com.vairiscw.wssandroid.view.environment_page.BigEnvironmentPage;
 import com.vairiscw.wssandroid.view.environment_page.SmallEnvironmentPage;
 import com.vairiscw.wssandroid.view.environment_page.NoPaddingItemDecoration;
@@ -34,15 +38,15 @@ import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity {
     //Параметры погоды
-    RecyclerView weatherRecyclerView;
+    ViewPager2 weatherRecyclerView;
     List<SmallEnvironmentPage> weatherList;
     int[] weatherIcons = {R.drawable.sun_icon, R.drawable.clouds_icon, R.drawable.rain_icon};
     String[] weatherTitles = {"Ясно", "Пасмурно", "Дождь"};
     int weatherListSize = 3;
-    SmallListRecyclerAdapter weatherRecyclerAdapter;
+    SmallListRecyclerAdapter weatherCoverAdapter;
 
     //Параметры звука
-    RecyclerView soundsRecyclerView;
+    ViewPager2 soundsRecyclerView;
     List<SmallEnvironmentPage> soundsList;
     int[] soundsIcons = {R.drawable.creature_icon, R.drawable.water_icon, R.drawable.birds_icon, R.drawable.fireplace_icon};
     String[] soundsTitles = {"Сверчки", "Вода", "Птицы", "Камин"};
@@ -65,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     List<BigEnvironmentPage> videoList;
     Button videoChoiceButton;
     ImageView videoExitButton;
-    RecyclerView videoRecyclerView;
+    ViewPager2 videoRecyclerView;
     BigListRecyclerAdapter videoRecyclerAdapter;
     TextView videoUnderText;
     //Параметры сцены
@@ -75,9 +79,12 @@ public class MainActivity extends AppCompatActivity {
     List<BigEnvironmentPage> sceneList;
     Button sceneChoiceButton;
     ImageView sceneExitButton;
-    RecyclerView sceneRecyclerView;
+    ViewPager2 sceneRecyclerView;
     BigListRecyclerAdapter sceneRecyclerAdapter;
     TextView sceneUnderText;
+
+    //Меню
+    ImageView template_button;
 
     //Интернет
     private final String serverUrl = "http://192.168.27.134:9898";
@@ -90,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        menuSetup();
         weatherRecycleSetup();
         timeButtonSetup();
         soundsRecyclerSetup();
@@ -100,6 +108,51 @@ public class MainActivity extends AppCompatActivity {
         fanAPI = retrofit.create(FanAPI.class);
         scenesAPI = retrofit.create(ScenesAPI.class);
         timesAPI = retrofit.create(TimesAPI.class);
+    }
+
+    private void menuSetup() {
+        template_button = findViewById(R.id.templates_menu_button);
+        template_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopupMenu(v);
+            }
+        });
+    }
+
+    private void showPopupMenu(View v) {
+        PopupMenu popupMenu = new PopupMenu(this, v);
+        popupMenu.inflate(R.menu.menu_tamplates);
+
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.template_save) {
+
+                    return true;
+                }
+                else if (id == R.id.show_templates) {
+
+                    return true;
+                }
+                else if (id ==  R.id.template_delete) {
+
+                    return true;
+                }
+                    else
+                        return false;
+
+            }
+        });
+
+        popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
+            @Override
+            public void onDismiss(PopupMenu menu) {
+
+            }
+        });
+        popupMenu.show();
     }
 
 //    protected void postStatus() {
@@ -131,29 +184,42 @@ public class MainActivity extends AppCompatActivity {
         }
 
         weatherRecyclerView = findViewById(R.id.weatherRecyclerView);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        weatherRecyclerView.setLayoutManager(layoutManager);
-        weatherRecyclerView.addItemDecoration(new NoPaddingItemDecoration());
-        weatherRecyclerAdapter = new SmallListRecyclerAdapter(weatherList, this);
-        weatherRecyclerView.setAdapter(weatherRecyclerAdapter);
+        weatherCoverAdapter = new SmallListRecyclerAdapter(weatherList, this);
+        weatherRecyclerView.setAdapter(weatherCoverAdapter);
 
-        LinearSnapHelper snapHelper = new LinearSnapHelper();
-        snapHelper.attachToRecyclerView(weatherRecyclerView);
-
-        weatherRecyclerView.scrollToPosition(Integer.MAX_VALUE / 2);
-        weatherRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        weatherRecyclerView.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    View snappedView = snapHelper.findSnapView(layoutManager);
-                    if (snappedView != null) {
-                        int position = recyclerView.getChildAdapterPosition(snappedView);
-                        weatherRecyclerAdapter.setActivePosition(position);
-                    }
-                }
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                weatherCoverAdapter.setActivePosition(position);
             }
         });
 
+        int padding = 50;
+        weatherRecyclerView.setPadding(padding, 0, padding, 0);
+        weatherRecyclerView.setClipToPadding(false);
+        weatherRecyclerView.setClipChildren(false);
+        weatherRecyclerView.setOffscreenPageLimit(1);
+
+        weatherRecyclerView.setPageTransformer(new ViewPager2.PageTransformer()
+        {
+            @Override
+            public void transformPage(@NonNull View page, float position) {
+                float absPos = Math.abs(position);
+
+                if (position < -1) {
+                    page.setAlpha(0f);
+                } else if (position <= 1) {
+                    page.setAlpha(1f);
+                    page.setTranslationX(-position * page.getWidth());
+                    float scaleFactor = 0.85f + (1 - absPos) * 0.15f;
+                    page.setScaleX(scaleFactor);
+                    page.setScaleY(scaleFactor);
+                } else {
+                    page.setAlpha(0f);
+                }
+            }
+        });
     }
 
     protected void timeButtonSetup() {
@@ -199,25 +265,39 @@ public class MainActivity extends AppCompatActivity {
         }
 
         soundsRecyclerView = findViewById(R.id.soundsRecyclerView);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        soundsRecyclerView.setLayoutManager(layoutManager);
-        soundsRecyclerView.addItemDecoration(new NoPaddingItemDecoration());
         soundsRecyclerAdapter = new SmallListRecyclerAdapter(soundsList, this);
         soundsRecyclerView.setAdapter(soundsRecyclerAdapter);
 
-        LinearSnapHelper snapHelper = new LinearSnapHelper();
-        snapHelper.attachToRecyclerView(soundsRecyclerView);
-
-        soundsRecyclerView.scrollToPosition(Integer.MAX_VALUE / 2);
-        soundsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        soundsRecyclerView.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    View snappedView = snapHelper.findSnapView(layoutManager);
-                    if (snappedView != null) {
-                        int position = recyclerView.getChildAdapterPosition(snappedView);
-                        soundsRecyclerAdapter.setActivePosition(position);
-                    }
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                soundsRecyclerAdapter.setActivePosition(position);
+            }
+        });
+
+        int padding = 50;
+        soundsRecyclerView.setPadding(padding, 0, padding, 0);
+        soundsRecyclerView.setClipToPadding(false);
+        soundsRecyclerView.setClipChildren(false);
+        soundsRecyclerView.setOffscreenPageLimit(1);
+
+        soundsRecyclerView.setPageTransformer(new ViewPager2.PageTransformer()
+        {
+            @Override
+            public void transformPage(@NonNull View page, float position) {
+                float absPos = Math.abs(position);
+
+                if (position < -1) {
+                    page.setAlpha(0f);
+                } else if (position <= 1) {
+                    page.setAlpha(1f);
+                    page.setTranslationX(-position * page.getWidth());
+                    float scaleFactor = 0.85f + (1 - absPos) * 0.15f;
+                    page.setScaleX(scaleFactor);
+                    page.setScaleY(scaleFactor);
+                } else {
+                    page.setAlpha(0f);
                 }
             }
         });
@@ -254,30 +334,37 @@ public class MainActivity extends AppCompatActivity {
 
                 videoRecyclerView = dialog.findViewById(R.id.windowedRecyclerView);
 
-                LinearLayoutManager layoutManager = new LinearLayoutManager(v.getContext(), LinearLayoutManager.HORIZONTAL, false);
-                videoRecyclerView.setLayoutManager(layoutManager);
-                videoRecyclerView.addItemDecoration(new NoPaddingItemDecoration());
                 videoRecyclerAdapter = new BigListRecyclerAdapter(videoList, v.getContext());
                 videoRecyclerView.setAdapter(videoRecyclerAdapter);
 
-                LinearSnapHelper snapHelper = new LinearSnapHelper();
-                snapHelper.attachToRecyclerView(videoRecyclerView);
-
-                videoRecyclerView.scrollToPosition(Integer.MAX_VALUE / 2);
-                videoRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                videoRecyclerView.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
                     @Override
-                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                            View snappedView = snapHelper.findSnapView(layoutManager);
-                            if (snappedView != null) {
-                                int position = recyclerView.getChildAdapterPosition(snappedView);
-                                videoRecyclerAdapter.setActivePosition(position);
-
-                                videoUnderText.setText(videoTitles[position % videoListSize]);
-                            }
-                        }
+                    public void onPageSelected(int position) {
+                        super.onPageSelected(position);
+                        videoRecyclerAdapter.setActivePosition(position);
                     }
                 });
+
+
+//                videoRecyclerView.setPageTransformer(new ViewPager2.PageTransformer()
+//                {
+//                    @Override
+//                    public void transformPage(@NonNull View page, float position) {
+//                        float absPos = Math.abs(position);
+//
+//                        if (position < -1) {
+//                            page.setAlpha(0f);
+//                        } else if (position <= 1) {
+//                            page.setAlpha(1f);
+//                            page.setTranslationX(-position * page.getWidth());
+//                            float scaleFactor = 0.85f + (1 - absPos) * 0.15f;
+//                            page.setScaleX(scaleFactor);
+//                            page.setScaleY(scaleFactor);
+//                        } else {
+//                            page.setAlpha(0f);
+//                        }
+//                    }
+//                });
 
                 dialog.show();
             }
@@ -315,28 +402,15 @@ public class MainActivity extends AppCompatActivity {
 
                 sceneRecyclerView = dialog.findViewById(R.id.windowedRecyclerView);
 
-                LinearLayoutManager layoutManager = new LinearLayoutManager(v.getContext(), LinearLayoutManager.HORIZONTAL, false);
-                sceneRecyclerView.setLayoutManager(layoutManager);
-                sceneRecyclerView.addItemDecoration(new NoPaddingItemDecoration());
                 sceneRecyclerAdapter = new BigListRecyclerAdapter(sceneList, v.getContext());
                 sceneRecyclerView.setAdapter(sceneRecyclerAdapter);
 
-                LinearSnapHelper snapHelper = new LinearSnapHelper();
-                snapHelper.attachToRecyclerView(sceneRecyclerView);
 
-                sceneRecyclerView.scrollToPosition(Integer.MAX_VALUE / 2);
-                sceneRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                sceneRecyclerView.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
                     @Override
-                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                            View snappedView = snapHelper.findSnapView(layoutManager);
-                            if (snappedView != null) {
-                                int position = recyclerView.getChildAdapterPosition(snappedView);
-                                sceneRecyclerAdapter.setActivePosition(position);
-
-                                sceneUnderText.setText(sceneTitles[position % sceneListSize]);
-                            }
-                        }
+                    public void onPageSelected(int position) {
+                        super.onPageSelected(position);
+                        sceneRecyclerAdapter.setActivePosition(position);
                     }
                 });
 
