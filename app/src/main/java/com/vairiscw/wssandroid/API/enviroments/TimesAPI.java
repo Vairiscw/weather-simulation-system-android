@@ -8,6 +8,6 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface TimesAPI {
-    @GET("/components/time")
+    @GET("/environments/time")
     Call<List<Time>> getTimes();
 }

@@ -5,6 +5,6 @@ import okhttp3.ResponseBody;
 import retrofit2.http.GET;
 
 public interface CheckAPI {
-    @GET("/fan")
+    @GET("/templates")
     Call<ResponseBody> checkingConnection();
 }

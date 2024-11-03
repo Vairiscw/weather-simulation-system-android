@@ -9,6 +9,6 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface VoiceAPI {
-    @GET("/components/voice")
+    @GET("/environments/voice")
     Call<List<Voice>> getVoices();
 }

@@ -1,4 +1,4 @@
-package com.vairiscw.wssandroid.adapters;
+package com.vairiscw.wssandroid.view.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;

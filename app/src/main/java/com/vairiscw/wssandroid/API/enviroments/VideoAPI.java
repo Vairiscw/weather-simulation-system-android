@@ -8,6 +8,6 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface VideoAPI {
-    @GET("/components/video")
+    @GET("/environments/video")
     Call<List<Video>> getVideos();
 }

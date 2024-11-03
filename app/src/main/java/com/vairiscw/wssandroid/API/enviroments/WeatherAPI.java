@@ -8,6 +8,6 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface WeatherAPI {
-    @GET("/components/weather")
+    @GET("/environments/weather")
     Call<List<Weather>> getWeathers();
 }

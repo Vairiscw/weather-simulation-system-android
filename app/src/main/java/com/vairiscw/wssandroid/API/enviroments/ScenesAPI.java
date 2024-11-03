@@ -9,6 +9,6 @@ import retrofit2.http.GET;
 
 public interface ScenesAPI {
 
-    @GET("/components/scene")
+    @GET("/environments/scene")
     Call<List<Scene>> getScenes();
 }
